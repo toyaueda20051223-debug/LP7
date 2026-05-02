@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ENSEMBLE — ファッションサブスクリプション</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #f8f6f3;
+      --bg-dark:  #171717;
+      --text:     #1c1c1c;
+      --text-lt:  #f8f6f3;
+      --muted:    #8c8c8c;
+      --accent:   #b5a090;
+      --accent-l: #e8dfd8;
+      --border:   #e2dcd5;
+      --serif: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      --sans:  'Noto Sans JP', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.9;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; max-width: 100%; }
+    a   { text-decoration: none; }
+
+    /* ── HEADER ── */
+    .hd {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 60px;
+      transition: all .4s ease;
+    }
+    .hd.on {
+      background: rgba(248,246,243,.96);
+      backdrop-filter: blur(16px);
+      padding: 16px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hd-logo {
+      font-family: var(--serif); font-size: 20px; letter-spacing: .35em;
+      text-transform: uppercase; color: #fff; transition: color .4s;
+    }
+    .hd.on .hd-logo { color: var(--text); }
+    .hd-nav { display: flex; gap: 36px; list-style: none; }
+    .hd-nav a {
+      font-size: 11px; letter-spacing: .14em;
+      color: rgba(255,255,255,.75); transition: color .3s;
+    }
+    .hd-nav a:hover { color: #fff; }
+    .hd.on .hd-nav a { color: var(--muted); }
+    .hd.on .hd-nav a:hover { color: var(--text); }
+    .hd-btn {
+      font-size: 11px; letter-spacing: .18em;
+      padding: 10px 24px;
+      border: 1px solid rgba(255,255,255,.5); color: #fff;
+      transition: all .3s;
+    }
+    .hd-btn:hover { background: rgba(255,255,255,.12); }
+    .hd.on .hd-btn { border-color: var(--text); color: var(--text); }
+    .hd.on .hd-btn:hover { background: var(--text); color: var(--bg); }
+
+    /* ── HERO / FV ── */
+    .hero {
+      position: relative; height: 100vh; min-height: 640px;
+      overflow: hidden; display: flex; align-items: center;
+    }
+    .hero-bg { position: absolute; inset: 0; }
+    .hero-bg img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 15%;
+      filter: saturate(.7);
+      animation: zoom 14s ease forwards;
+    }
+    @keyframes zoom { from { transform: scale(1.07); } to { transform: scale(1); } }
+    .hero-ov {
+      position: absolute; inset: 0;
+      background: linear-gradient(140deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.3) 60%, rgba(0,0,0,.15) 100%);
+    }
+    .hero-body {
+      position: relative; z-index: 2;
+      padding: 0 88px; max-width: 700px;
+    }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 14px;
+      font-family: var(--serif); font-size: 11px;
+      letter-spacing: .4em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 28px;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block; width: 32px; height: 1px; background: var(--accent);
+    }
+    .hero-h1 {
+      font-family: var(--serif);
+      font-size: clamp(44px, 6.5vw, 78px);
+      font-weight: 300; line-height: 1.2;
+      letter-spacing: .06em; color: #fff;
+      margin-bottom: 28px;
+    }
+    .hero-h1 em { font-style: italic; color: #ddd0c4; }
+    .hero-sub {
+      font-size: 13px; color: rgba(255,255,255,.65);
+      letter-spacing: .06em; line-height: 2.1;
+      margin-bottom: 52px; max-width: 400px;
+    }
+    .hero-acts { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 16px 40px;
+      background: #fff; color: var(--text);
+      font-size: 12px; letter-spacing: .2em;
+      transition: all .3s;
+    }
+    .btn-white:hover { background: var(--accent); color: #fff; transform: translateX(6px); }
+    .hero-note { font-size: 11px; color: rgba(255,255,255,.45); letter-spacing: .05em; }
+    .hero-scroll {
+      position: absolute; bottom: 40px; left: 88px; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .hero-scroll span {
+      font-family: var(--serif); font-size: 9px;
+      letter-spacing: .3em; text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+    }
+    .hero-scroll-line {
+      width: 1px; height: 44px; background: var(--accent);
+      transform-origin: top;
+      animation: scl 2s ease-in-out infinite;
+    }
+    @keyframes scl {
+      0%,100% { transform: scaleY(1); opacity: 1; }
+      50%      { transform: scaleY(.35); opacity: .35; }
+    }
+
+    /* ── SECTION BASE ── */
+    .sec { padding: 120px 88px; }
+    .sec-lbl {
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+      font-family: var(--serif); font-size: 10px;
+      letter-spacing: .4em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 20px;
+    }
+    .sec-lbl::before, .sec-lbl::after {
+      content: ''; display: block; width: 36px; height: 1px; background: var(--accent);
+    }
+    .sec-h2 {
+      font-family: var(--serif);
+      font-size: clamp(28px, 3.2vw, 42px);
+      font-weight: 400; text-align: center;
+      letter-spacing: .05em; line-height: 1.5;
+      margin-bottom: 72px;
+    }
+
+    /* ── BENEFITS ── */
+    .bn-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+    }
+    .bn-item {
+      padding: 60px 48px;
+      border-right: 1px solid var(--border);
+      transition: background .3s;
+    }
+    .bn-item:last-child { border-right: none; }
+    .bn-item:hover { background: #fff; }
+    .bn-num {
+      font-family: var(--serif); font-size: 52px; font-weight: 300;
+      color: var(--accent-l); line-height: 1; margin-bottom: 24px;
+    }
+    .bn-h3 {
+      font-family: var(--serif); font-size: 22px; font-weight: 400;
+      letter-spacing: .05em; line-height: 1.5; margin-bottom: 18px;
+    }
+    .bn-p { font-size: 13px; color: var(--muted); line-height: 2.1; }
+
+    /* ── SOCIAL PROOF ── */
+    .sp { background: var(--bg-dark); color: var(--text-lt); }
+    .sp .sec-lbl { color: var(--accent); }
+    .sp .sec-lbl::before, .sp .sec-lbl::after { background: var(--accent); }
+    .sp .sec-h2 { color: var(--text-lt); }
+    .sp-badge {
+      display: flex; align-items: center; gap: 28px;
+      max-width: 520px; margin: 0 auto 72px;
+      padding: 28px 36px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .sp-avatar {
+      width: 68px; height: 68px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #8a7060);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-style: italic; font-size: 24px; color: #fff;
+    }
+    .sp-badge h4 {
+      font-family: var(--serif); font-size: 15px; font-weight: 400;
+      letter-spacing: .08em; color: var(--text-lt); margin-bottom: 6px;
+    }
+    .sp-badge p { font-size: 12px; color: rgba(248,246,243,.45); line-height: 1.8; }
+    .sp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .sp-card {
+      padding: 36px; border: 1px solid rgba(255,255,255,.07);
+      transition: border-color .3s;
+    }
+    .sp-card:hover { border-color: rgba(181,160,144,.4); }
+    .sp-mark {
+      font-family: var(--serif); font-size: 60px; line-height: 1;
+      color: var(--accent); opacity: .25; margin-bottom: 8px;
+    }
+    .sp-stars { display: flex; gap: 3px; margin-bottom: 16px; }
+    .sp-stars span { color: var(--accent); font-size: 13px; }
+    .sp-text { font-size: 13px; color: rgba(248,246,243,.62); line-height: 2.1; margin-bottom: 24px; }
+    .sp-author { display: flex; align-items: center; gap: 12px; }
+    .sp-av {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(181,160,144,.25);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-size: 12px; color: var(--accent);
+      flex-shrink: 0;
+    }
+    .sp-name { font-size: 11px; color: rgba(248,246,243,.4); letter-spacing: .05em; }
+
+    /* ── BANNER SHOWCASE ── */
+    .ad-sec { background: var(--bg); }
+    .ad-lead {
+      max-width: 540px; margin: 0 auto 80px; text-align: center;
+    }
+    .ad-lead p { font-size: 13px; color: var(--muted); line-height: 2.1; }
+    .ad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; max-width: 1040px; margin: 0 auto; }
+    .ad-wrap { display: flex; flex-direction: column; gap: 20px; }
+    .ad-meta { display: flex; align-items: center; gap: 12px; }
+    .ad-tag {
+      font-size: 10px; letter-spacing: .15em; text-transform: uppercase;
+      padding: 4px 12px; border: 1px solid var(--border); color: var(--muted);
+    }
+    .ad-name { font-size: 12px; color: var(--muted); }
+
+    /* Banner A — 感覚訴求 */
+    .ban-a { width: 100%; aspect-ratio: 4/3; position: relative; overflow: hidden; }
+    .ban-a-bg { position: absolute; inset: 0; }
+    .ban-a-bg img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: saturate(.55) brightness(.68);
+      transition: transform .6s ease, filter .4s;
+    }
+    .ban-a:hover .ban-a-bg img { transform: scale(1.04); filter: saturate(.62) brightness(.74); }
+    .ban-a-ov {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,.1) 100%);
+    }
+    .ban-a-body {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 44px;
+    }
+    .ban-a-ey {
+      font-family: var(--serif); font-size: 9px; letter-spacing: .4em;
+      text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 18px;
+    }
+    .ban-a-h {
+      font-family: var(--serif);
+      font-size: clamp(22px, 2.8vw, 32px);
+      font-weight: 300; color: #fff;
+      letter-spacing: .1em; line-height: 1.35; margin-bottom: 28px;
+    }
+    .ban-a-h em { font-style: italic; color: #ddd0c4; }
+    .ban-a-btn {
+      font-size: 10px; letter-spacing: .25em; text-transform: uppercase;
+      padding: 9px 22px; border: 1px solid rgba(255,255,255,.45); color: #fff;
+      display: inline-flex; align-items: center; gap: 10px; transition: all .3s;
+    }
+    .ban-a:hover .ban-a-btn { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.7); }
+
+    /* Banner B — 機能訴求 */
+    .ban-b { width: 100%; aspect-ratio: 4/3; background: var(--bg-dark); display: grid; grid-template-columns: 1.3fr 1fr; overflow: hidden; }
+    .ban-b-l { padding: 36px 40px; display: flex; flex-direction: column; justify-content: center; }
+    .ban-b-ey {
+      font-size: 9px; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px;
+    }
+    .ban-b-price {
+      font-family: var(--serif);
+      font-size: clamp(18px, 2.2vw, 26px);
+      color: var(--text-lt); font-weight: 300;
+      letter-spacing: .04em; line-height: 1.45; margin-bottom: 20px;
+    }
+    .ban-b-price span {
+      display: block; font-size: 11px; color: rgba(248,246,243,.5);
+      font-family: var(--sans); margin-top: 4px; letter-spacing: .08em;
+    }
+    .ban-b-list { list-style: none; margin-bottom: 24px; }
+    .ban-b-list li {
+      font-size: 11px; color: rgba(248,246,243,.55);
+      padding: 3px 0; display: flex; align-items: center; gap: 8px;
+    }
+    .ban-b-list li::before {
+      content: ''; display: block; width: 14px; height: 1px;
+      background: var(--accent); flex-shrink: 0;
+    }
+    .ban-b-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 10px; letter-spacing: .18em;
+      background: var(--accent); color: #fff;
+      padding: 10px 20px; width: fit-content;
+      transition: background .3s, transform .3s;
+    }
+    .ban-b:hover .ban-b-btn { background: #c4b09a; transform: translateX(4px); }
+    .ban-b-r { position: relative; overflow: hidden; }
+    .ban-b-r::before {
+      content: ''; position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(to right, var(--bg-dark) 0%, transparent 35%);
+      pointer-events: none;
+    }
+    .ban-b-r img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: saturate(.45) brightness(.8);
+      transition: transform .6s, filter .4s;
+    }
+    .ban-b:hover .ban-b-r img { transform: scale(1.05); filter: saturate(.52) brightness(.86); }
+
+    .ban-note {
+      padding: 18px 22px;
+      background: #fff; border-left: 2px solid var(--accent-l);
+      font-size: 12px; color: var(--muted); line-height: 1.9;
+    }
+    .ban-note strong { color: var(--text); font-weight: 500; }
+
+    /* ── DESIGN RATIONALE ── */
+    .rationale {
+      padding: 80px 88px; background: #fff;
+      border-top: 1px solid var(--border);
+    }
+    .rat-inner { max-width: 880px; margin: 0 auto; }
+    .rat-lbl {
+      font-family: var(--serif); font-size: 10px;
+      letter-spacing: .35em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 40px;
+    }
+    .rat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .rat-item { padding: 28px 32px; border: 1px solid var(--border); }
+    .rat-item h4 {
+      font-family: var(--serif); font-size: 15px; font-weight: 400;
+      letter-spacing: .05em; margin-bottom: 12px;
+    }
+    .rat-item p { font-size: 12px; color: var(--muted); line-height: 2; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px 88px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid var(--border); background: var(--bg);
+    }
+    .ft-logo {
+      font-family: var(--serif); font-size: 18px;
+      letter-spacing: .32em; text-transform: uppercase;
+    }
+    .ft-copy { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
+
+    /* ── FADE UP ── */
+    .fu {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .75s ease, transform .75s ease;
+    }
+    .fu.vis { opacity: 1; transform: none; }
+    .fu:nth-child(2) { transition-delay: .1s; }
+    .fu:nth-child(3) { transition-delay: .2s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      .hd, .hd.on { padding: 18px 28px; }
+      .hd-nav { display: none; }
+      .hero-body { padding: 0 32px; max-width: 100%; }
+      .hero-scroll { left: 32px; }
+      .sec { padding: 80px 28px; }
+      .bn-grid { grid-template-columns: 1fr; }
+      .bn-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .bn-item:last-child { border-bottom: none; }
+      .sp-grid { grid-template-columns: 1fr; }
+      .ad-grid { grid-template-columns: 1fr; }
+      .rationale { padding: 60px 28px; }
+      .rat-grid { grid-template-columns: 1fr; }
+      footer { padding: 36px 28px; flex-direction: column; gap: 12px; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .hero-h1 { font-size: 36px; }
+      .sec-h2 { font-size: 26px; }
+      .ban-b { grid-template-columns: 1fr; }
+      .ban-b-r { height: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="hd" id="hd">
+    <a href="#" class="hd-logo">Ensemble</a>
+    <nav><ul class="hd-nav">
+      <li><a href="#benefits">Features</a></li>
+      <li><a href="#voices">Voices</a></li>
+      <li><a href="#ad">AD Design</a></li>
+    </ul></nav>
+    <a href="#cta" class="hd-btn">Free Trial</a>
+  </header>
+
+  <!-- HERO / FV -->
+  <section class="hero">
+    <div class="hero-bg">
+      <img
+        src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1600&q=85&auto=format&fit=crop&crop=top"
+        alt="Fashion editorial"
+        loading="eager"
+      >
+    </div>
+    <div class="hero-ov"></div>
+    <div class="hero-body">
+      <span class="hero-eyebrow">Fashion Subscription</span>
+      <h1 class="hero-h1">毎日、<em>違う私</em>で<br>いこう。</h1>
+      <p class="hero-sub">
+        プロスタイリストが選ぶコーデが<br>
+        毎月あなただけに届く、<br>新しいファッション体験。
+      </p>
+      <div class="hero-acts" id="cta">
+        <a href="#" class="btn-white">
+          今すぐ試す
+          <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+            <path d="M0 5h14M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </a>
+        <span class="hero-note">初月無料 ・ いつでも解約可</span>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="hero-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section class="sec" id="benefits">
+    <p class="sec-lbl fu">Benefits</p>
+    <h2 class="sec-h2 fu">ENSEMBLEが変える、<br>あなたの毎朝。</h2>
+    <div class="bn-grid">
+      <div class="bn-item fu">
+        <div class="bn-num">01</div>
+        <h3 class="bn-h3">もう、服選びで<br>悩まない</h3>
+        <p class="bn-p">毎朝クローゼットの前で迷う時間がゼロに。あなたのライフスタイルを理解したスタイリストが、最適なコーデを厳選してお届けします。</p>
+      </div>
+      <div class="bn-item fu">
+        <div class="bn-num">02</div>
+        <h3 class="bn-h3">新しい自分に、<br>出会える</h3>
+        <p class="bn-p">自分では手に取らなかったスタイルが、新たな魅力を引き出すきっかけに。毎月届く驚きと発見が、あなたをアップデートします。</p>
+      </div>
+      <div class="bn-item fu">
+        <div class="bn-num">03</div>
+        <h3 class="bn-h3">コスパよく<br>おしゃれを楽しむ</h3>
+        <p class="bn-p">バイヤー直仕入れで実現した圧倒的なコストパフォーマンス。トレンドアイテムを気軽に楽しめるから、クローゼットも心もすっきり。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="sec sp" id="voices">
+    <p class="sec-lbl fu">Voices</p>
+    <h2 class="sec-h2 fu">使ってみた、<br>リアルな声。</h2>
+    <div class="sp-badge fu">
+      <div class="sp-avatar">S</div>
+      <div>
+        <h4>Styled by Professional Curators</h4>
+        <p>百貨店バイヤー・スタイリスト経験者が監修。<br>累計 5,000名以上のコーデをサポート。</p>
+      </div>
+    </div>
+    <div class="sp-grid">
+      <div class="sp-card fu">
+        <div class="sp-mark">"</div>
+        <div class="sp-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="sp-text">毎朝コーデを考えるのが苦手だったのに、届いた服を着るだけで「今日おしゃれだね」と言われるように。もう手放せません。</p>
+        <div class="sp-author"><div class="sp-av">M</div><span class="sp-name">M.K. ／ 28歳・会社員</span></div>
+      </div>
+      <div class="sp-card fu">
+        <div class="sp-mark">"</div>
+        <div class="sp-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="sp-text">自分では絶対選ばないカラーのアイテムが届いて最初は不安だったけど、着てみたら周りの反応が全然違った。新しい自分を発見できた感じ。</p>
+        <div class="sp-author"><div class="sp-av">R</div><span class="sp-name">R.T. ／ 34歳・フリーランス</span></div>
+      </div>
+      <div class="sp-card fu">
+        <div class="sp-mark">"</div>
+        <div class="sp-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="sp-text">育休中でなかなか買い物に行けなかったけど、ENSEMBLEで毎月楽しみが増えた。コスパも大満足で継続中です。</p>
+        <div class="sp-author"><div class="sp-av">A</div><span class="sp-name">A.N. ／ 31歳・育休中</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BANNER SHOWCASE: A/B TEST -->
+  <section class="sec ad-sec" id="ad">
+    <p class="sec-lbl fu">AD Design</p>
+    <h2 class="sec-h2 fu">バナー案：A/Bテスト設計</h2>
+    <div class="ad-lead fu">
+      <p>CTR向上を目的に、訴求軸の異なる2パターンを制作。<br>感覚訴求（Pattern A）と機能訴求（Pattern B）を対比させ、<br>ターゲットセグメント別の反応差を検証します。</p>
+    </div>
+    <div class="ad-grid">
+
+      <!-- Pattern A -->
+      <div class="ad-wrap fu">
+        <div class="ad-meta">
+          <span class="ad-tag">Pattern A</span>
+          <span class="ad-name">感覚訴求 / 自己変化</span>
+        </div>
+        <div class="ban-a">
+          <div class="ban-a-bg">
+            <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80&auto=format&fit=crop" alt="Banner A">
+          </div>
+          <div class="ban-a-ov"></div>
+          <div class="ban-a-body">
+            <span class="ban-a-ey">Fashion Subscription</span>
+            <h3 class="ban-a-h">毎日、<em>違う私</em>で<br>いこう。</h3>
+            <a href="#" class="ban-a-btn">
+              試してみる
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                <path d="M0 4h10M7 1l3 3-3 3" stroke="currentColor" stroke-width="1"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div class="ban-note">
+          <strong>狙い：</strong>感情・憧れに訴えるビジュアル重視の設計。自己変化・ライフスタイル向上を想起させ、ファッション感度の高い層のクリックを狙う。
+        </div>
+      </div>
+
+      <!-- Pattern B -->
+      <div class="ad-wrap fu">
+        <div class="ad-meta">
+          <span class="ad-tag">Pattern B</span>
+          <span class="ad-name">機能訴求 / 利便性</span>
+        </div>
+        <div class="ban-b">
+          <div class="ban-b-l">
+            <span class="ban-b-ey">Fashion Subscription</span>
+            <div class="ban-b-price">
+              月額 ¥9,800〜<br>プロが選ぶ<br>コーデが届く
+              <span>スタイリスト完全監修</span>
+            </div>
+            <ul class="ban-b-list">
+              <li>初月完全無料</li>
+              <li>いつでも解約OK</li>
+              <li>サイズ・テイスト対応</li>
+            </ul>
+            <a href="#" class="ban-b-btn">
+              まず1ヶ月試す
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                <path d="M0 4h10M7 1l3 3-3 3" stroke="white" stroke-width="1"/>
+              </svg>
+            </a>
+          </div>
+          <div class="ban-b-r">
+            <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=600&q=80&auto=format&fit=crop" alt="Banner B">
+          </div>
+        </div>
+        <div class="ban-note">
+          <strong>狙い：</strong>価格・利便性で背中を押す合理的訴求。迷っている層に「まず試してみよう」を誘発し、コンバージョン率の改善を狙う。
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DESIGN RATIONALE -->
+  <div class="rationale">
+    <div class="rat-inner">
+      <p class="rat-lbl">Design Rationale</p>
+      <div class="rat-grid">
+        <div class="rat-item">
+          <h4>FV設計思想</h4>
+          <p>フルブリード写真＋薄暗いオーバーレイで世界観と可読性を両立。「何のサービスか」が3秒で伝わる情報優先度で設計。</p>
+        </div>
+        <div class="rat-item">
+          <h4>トーン&マナー</h4>
+          <p>彩度を落としたモノトーン系ビジュアル＋細セリフフォントで上品さを演出。セール感を排除し、ライフスタイルブランドとしての信頼感を構築。</p>
+        </div>
+        <div class="rat-item">
+          <h4>コピー設計</h4>
+          <p>「機能」ではなく「変化」を書く。「服が届く」→「毎朝が変わる」の言い換えで、ベネフィットを感情レベルで訴求。</p>
+        </div>
+        <div class="rat-item">
+          <h4>A/Bテスト前提</h4>
+          <p>感覚軸（CTR重視・ファッション感度層）と機能軸（CVR重視・コスパ重視層）の2パターンで、ファネル段階別の最適訴求を検証できる構造。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="ft-logo">Ensemble</span>
+    <p class="ft-copy">© 2026 ENSEMBLE. Portfolio LP — Fashion Subscription Concept.</p>
+  </footer>
+
+  <script>
+    // ヘッダースクロール制御
+    const hd = document.getElementById('hd');
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          hd.classList.toggle('on', window.scrollY > 60);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // フェードアニメーション
+    const io = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); }
+      }),
+      { threshold: .12, rootMargin: '0px 0px -32px 0px' }
+    );
+    document.querySelectorAll('.fu').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
